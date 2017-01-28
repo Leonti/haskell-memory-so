@@ -11,7 +11,7 @@ import Control.Monad
 import Data.Time.Clock
 import Data.Time.Calendar
 
-import Data.List.Split
+-- import Data.List.Split
 
 import System.Environment
 import System.Directory
@@ -19,7 +19,8 @@ import System.Directory
 import ResultsParsing
 import Geocoding
 
-
+import Streaming 
+import qualified Streaming.Prelude as S
 
 main :: IO ()
 main =
@@ -28,18 +29,21 @@ main =
 processDate :: String -> IO ()
 processDate date = do
     allFiles <- listFiles date
-    allProperties <- mapM fileToProperties allFiles
-    let flattenedPropertiesWithPrice = filter hasPrice $ concat allProperties
-    geocodedProperties <- propertiesWithGeocoding flattenedPropertiesWithPrice
-    print geocodedProperties
+    let allProperties = S.mapM fileToProperties $ S.each allFiles
+        flattenedPropertiesWithPrice = S.filter hasPrice $ S.concat allProperties
+    S.print $  propertiesWithGeocoding flattenedPropertiesWithPrice
 
-propertiesWithGeocoding :: [ParsedProperty] -> IO [(ParsedProperty, Maybe LatLng)]
+-- propertiesWithGeocoding :: [ParsedProperty] -> IO [(ParsedProperty, Maybe LatLng)]
+propertiesWithGeocoding
+  :: Stream (Of ParsedProperty) IO r
+     -> Stream (Of (ParsedProperty, Maybe LatLng)) IO r
 propertiesWithGeocoding properties = do
-    let batchProperties = chunksOf 100 properties
-    batchGeocodedLocations <- mapM geocodeAddresses batchProperties
-    let geocodedLocations = fromJust $ concat <$> sequence batchGeocodedLocations
-    return geocodedLocations
-
+    let batchProperties = S.mapped S.toList $ chunksOf 100 properties
+    S.concat $ S.concat $ S.mapM geocodeAddresses batchProperties
+    -- concat here flattens a stream of lists of as into a stream of as
+    -- and a stream of maybe as into a stream of as
+ 
+    
 openURL :: String -> IO String
 openURL x = getResponseBody =<< simpleHTTP (getRequest x)
 
