@@ -29,3 +29,4 @@ executable haskell-memory
                       , sqlite-simple == 0.4.12.1
                       , split == 0.2.3.1
                       , tagsoup-selection == 0.1.0.1
+                      , streaming
