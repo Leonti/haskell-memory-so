@@ -1,0 +1,27 @@
+name:                haskell-memory
+version:             0.1.0.0
+synopsis:            Simple project template from stack
+description:         Please see README.md
+homepage:            https://github.com/githubuser/rea#readme
+license:             BSD3
+license-file:        LICENSE
+author:              Author name here
+maintainer:          example@example.com
+copyright:           2016 Author name here
+category:            Web
+build-type:          Simple
+cabal-version:       >=1.10
+
+executable haskell-memory
+  hs-source-dirs:      src
+  main-is:             Main.hs
+  default-language:    Haskell2010
+  other-modules:       Geocoding
+  build-depends:       base >= 4.7 && < 5
+                        , HTTP == 4000.3.3
+                        , text == 1.2.2.1
+                        , time == 1.6.0.1
+                        , directory == 1.2.6.2
+                        , aeson == 1.1.0.0
+                        , utf8-string == 1.0.1.1
+                        , split == 0.2.3.1
